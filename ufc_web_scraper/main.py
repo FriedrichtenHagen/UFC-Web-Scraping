@@ -13,7 +13,7 @@ def main():
     fighters.scrape_fighters()
 
     #Normalises tables for clean final output
-    normalise_tables()
+    normalise_tables.normalise_tables()
 
 if __name__ == '__main__':
     main()

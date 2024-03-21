@@ -137,5 +137,5 @@ def normalise_tables():
     print('Tables normalised')
 
 
-normalise_tables()
+# normalise_tables()
 
