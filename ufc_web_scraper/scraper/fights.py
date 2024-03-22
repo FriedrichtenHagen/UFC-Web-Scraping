@@ -60,7 +60,7 @@ def get_fighters(fight_details,fight_soup):
         return fight_soup.select('a.b-fight-details__person-link')[0].text, fight_soup.select('a.b-fight-details__person-link')[1].text
 
 #Scrape name of winner 
-def get_winner(win_lose):
+def get_winner(win_lose, f_1, f_2):
     #If there is a winner, set 'winner' to winning fighter. If no winner (e.g. NC, DQ) set 'winner' to NULL
     if (win_lose[0].text.strip()=='W') | (win_lose[1].text.strip()=='W'):
         if (win_lose[0].text.strip()=='W'):
@@ -140,7 +140,11 @@ def scrape_fights():
         
             for url in fight_urls:
 
-                fight_url = requests.get(url)
+                headers = {
+                    # Adding a User-Agent string that mimics a popular browser
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+                }
+                fight_url = requests.get(url, headers=headers)
                 fight_soup = bs4.BeautifulSoup(fight_url.text,'lxml')
 
                 #Define key select statements
@@ -162,14 +166,8 @@ def scrape_fights():
                 result,result_details = get_result(select_result,select_result_details)
                 finish_round = overview[0].text.split(':')[1]
                 finish_time = re.findall('\d:\d\d',overview[1].text)[0]
-                if (win_lose[0].text.strip()=='W') | (win_lose[1].text.strip()=='W'):
-                    if (win_lose[0].text.strip()=='W'):
-                        winner = f_1
-                    else:
-                        winner = f_2
-                else:
-                    winner = 'NULL'
 
+                winner = get_winner(win_lose, f_1, f_2)                  
 
                 #Adds row containing scraped fight details to csv file
                 writer.writerow([event_name.strip(),
@@ -188,5 +186,5 @@ def scrape_fights():
                                  url])
                 
                 urls_scraped += 1
-        
+                print(f'{urls_scraped} urls have been scraped so far...')
         print(f'{urls_scraped}/{urls_to_scrape} links scraped successfully')
